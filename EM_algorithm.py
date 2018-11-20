@@ -12,6 +12,8 @@ parameters in stochastic volatility models.
 I am preparing a guide in JupyterLab that roughly
 introduces the theory.
 """
+# %reset -f
+# %clear
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -111,4 +113,22 @@ for t in np.arange(mat - 1)[::-1]:
     b_rs[:, t]       = backward_b[:, t] / b_scale[t]
     
 # --------------------------------------------- #
-# Smoothed probabilities: WIP.
+# Smoothed probabilities, present and conditional: WIP.
+smooth_p  = np.zeros(s_t * mat).reshape(s_t, mat)
+denom     = (b_rs * a_rs).sum(axis = 0)
+for t in np.arange(mat):
+    smooth_p[:, t] = b_rs[:, t] * a_rs[:, t] / denom[t]
+
+smooth_cp = np.zeros(s_t * s_t * (mat - 1) ).reshape((mat - 1), s_t, s_t)
+denom_cp  = denom * a_scale
+for t in np.arange(1,mat):
+    smooth_cp[t-1,:,:] = b_rs[:,t] * cond_dens(returns[t], theta[len(theta) - s_t:]) *\
+    p_matrix * a_rs[:, t-1] / denom_cp[t]
+
+# --------------------------------------------- #
+# Writing the expectation of the log-likelihood
+constant = 1
+first_sum = sum(sum(np.log(p_matrix) * smooth_cp.sum(axis = 0)))
+second_sum = sum(np.array([cond_dens(returns, v) for v in theta[len(theta) - s_t:]]).sum(axis = 1))
+log_lik = constant + first_sum + second_sum
+log_lik
