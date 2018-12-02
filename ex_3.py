@@ -31,4 +31,10 @@ pltf.scatterDuo(x1, x2, y1, y2, 'ARCH', 'A-ARCH', title = 'News Curve')
 
 # TAR model
 
-test = tsm.tarFct(0, 0, 0.6, 0.4, 1, 0, periods)
+tar = tsm.tarFct(0., 0., 0.2, 0.8, 1., 2.5, periods)
+
+xTar = tar[:periods - 1]
+yTar = tar[1:]
+
+pltf.scatterUno(xTar, yTar, xLab = 'Lagged returns', title = 'TAR model')
+pltf.plotUno(x, tar, title = 'TAR Process')

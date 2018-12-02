@@ -39,7 +39,7 @@ def tarFct(mu1, mu2, rho1, rho2, sig, lmbd, periods):
     z = np.random.normal(0, sig, periods)
 
     for t in np.arange(1, periods):
-        x[t] = (np.abs(x[t-1]) > lmbd ) * (mu1 + rho1 * x[t-1]) + (np.abs(x[t-1]) <= lmbd) * (mu2 + rho2 * x[t-1]) + z[t]
+        x[t] = (np.abs(x[t-1]) <= lmbd ) * (mu1 + rho1 * x[t-1]) + (np.abs(x[t-1]) > lmbd) * (mu2 + rho2 * x[t-1]) + z[t]
 
     return np.array(x)
 
