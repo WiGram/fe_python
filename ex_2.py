@@ -13,7 +13,7 @@ import statsmodels.api as sm
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 from ar_function import ar_fct         # Import time series simulation
-from llf_ar import llf_ar, llf_ar_sum  # Import llh contributions and fct.
+from llf_ar import llfAr, llfArSum     # Import llh contributions and fct.
 np.set_printoptions(suppress = True)   #disable scientific notation
 
 # ============================================= #
@@ -37,22 +37,22 @@ plt.show()
 
 # Finding parameters
 par = [5., 0.05, 1.]
-ar_opt = opt.minimize(llf_ar_sum, par, args = ar, method = 'L-BFGS-B')
+ar_opt = opt.minimize(llfArSum, par, args = ar, method = 'L-BFGS-B')
 
 # ============================================= #
 # ===== Applying llh function to actual data == #
 # ============================================= #
 
 # Finding parameters
-spread_opt = opt.minimize(llf_ar_sum, par, args = spread, method = 'L-BFGS-B')
+spread_opt = opt.minimize(llfArSum, par, args = spread, method = 'L-BFGS-B')
 est_par = spread_opt.x
 
 # Calculate standard errors
-h_fct = nd.Hessian(llf_ar_sum)
+h_fct = nd.Hessian(llfArSum)
 hess  = np.linalg.inv(h_fct(est_par, spread))
 se    = np.sqrt(np.diag(hess))
 
-jac_fct = nd.Jacobian(llf_ar)
+jac_fct = nd.Jacobian(llfAr)
 jac     = jac_fct(est_par, spread)
 jac     = np.transpose(jac.reshape(366,3))
 score   = np.inner(jac, jac)

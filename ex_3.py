@@ -14,7 +14,7 @@ import timeSeriesModule as tsm         # Import ARCH simulation
 import plotFct as pltf                 # Custom plotting
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
-periods = 10000
+periods = 1000
 x     = np.arange(0,periods)
 
 arch  = tsm.archFct(1., 0.5, periods)
@@ -31,7 +31,7 @@ pltf.scatterDuo(x1, x2, y1, y2, 'ARCH', 'A-ARCH', title = 'News Curve')
 
 # TAR model
 
-tar = tsm.tarFct(0., 0., 0.2, 0.8, 1., 2.5, periods)
+tar = tsm.tarFct(0., 0., 0., 1., 0.9, 2.5, periods)
 
 xTar = tar[:periods - 1]
 yTar = tar[1:]
