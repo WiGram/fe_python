@@ -13,6 +13,7 @@ sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
 import scipy.stats as ss               # Distribution functions
 import plotFct as pltf                 # Custom plotting
+import llf
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
 # First exercise 1.5
@@ -81,6 +82,6 @@ returns = sp500[['log-ret_x100']][15096:]
 pltf.plotUno(date, returns)
 
 initPar = np.array([1.0, 0.8])
-llfTArchSum(initPar, returns)
+llf.llfTArchSum(initPar, returns)
 
-res = opt.minimize(llfTArchSum, initPar, args = returns)
+res = opt.minimize(llf.llfTArchSum, initPar, args = returns)

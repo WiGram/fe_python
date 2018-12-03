@@ -4,7 +4,6 @@ Created on Thu Sep 20 22:18:21 2018
 
 @author: wigr11ab
 """
-!cls
 import sys
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 from ar_function import ar_fct

@@ -13,7 +13,7 @@ import statsmodels.api as sm
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 from ar_function import ar_fct         # Import time series simulation
-from llf_ar import llfAr, llfArSum     # Import llh contributions and fct.
+from llf import llfAr, llfArSum     # Import llh contributions and fct.
 np.set_printoptions(suppress = True)   #disable scientific notation
 
 # ============================================= #
