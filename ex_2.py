@@ -12,7 +12,7 @@ import scipy.optimize as opt           # Minimisation for MLE
 import statsmodels.api as sm
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
-from ar_function import ar_fct         # Import time series simulation
+import timeSeriesModule as tsm         # Import time series simulation
 from llf import llfAr, llfArSum     # Import llh contributions and fct.
 np.set_printoptions(suppress = True)   #disable scientific notation
 
@@ -31,13 +31,13 @@ plt.show()
 periods = len(spread)
 theta = [1.0, 0.5, 2.0]
 
-ar = ar_fct(*theta, periods)
-plt.plot(ar)
+ar = tsm.arFct(*theta, periods)
+plt.plot(ar[0])
 plt.show()
 
 # Finding parameters
-par = [5., 0.05, 1.]
-ar_opt = opt.minimize(llfArSum, par, args = ar, method = 'L-BFGS-B')
+par = [2., 0.05, 1.]
+ar_opt = opt.minimize(llfArSum, par, args = ar[0], method = 'L-BFGS-B')
 
 # ============================================= #
 # ===== Applying llh function to actual data == #
@@ -45,15 +45,15 @@ ar_opt = opt.minimize(llfArSum, par, args = ar, method = 'L-BFGS-B')
 
 # Finding parameters
 spread_opt = opt.minimize(llfArSum, par, args = spread, method = 'L-BFGS-B')
-est_par = spread_opt.x
+estPar = spread_opt.x
 
 # Calculate standard errors
 h_fct = nd.Hessian(llfArSum)
-hess  = np.linalg.inv(h_fct(est_par, spread))
+hess  = np.linalg.inv(h_fct(estPar, spread))
 se    = np.sqrt(np.diag(hess))
 
 jac_fct = nd.Jacobian(llfAr)
-jac     = jac_fct(est_par, spread)
+jac     = jac_fct(estPar, spread)
 jac     = np.transpose(jac.reshape(366,3))
 score   = np.inner(jac, jac)
 
@@ -61,7 +61,7 @@ robust_se = np.sqrt(np.diag(hess.dot(score).dot(hess)))
 robust_se
 
 # Simulate new series
-ar_new = ar_fct(*est_par, periods*4) # Increased length to identify stationarity
+ar_new = ar_fct(*estPar, periods*4) # Increased length to identify stationarity
 plt.plot(ar_new)
 plt.show()
 
@@ -76,4 +76,4 @@ ols_par = np.array([mu, rho, sig])
 
 # Compare parameters from MLE with OLS
 ols_par
-est_par
+estPar

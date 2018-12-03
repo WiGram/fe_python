@@ -11,6 +11,7 @@ import statsmodels.api as sm           # OLS estimation
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
+import score                           # Score module
 import scipy.stats as ss               # Distribution functions
 import plotFct as pltf                 # Custom plotting
 import llf
@@ -23,33 +24,7 @@ z = ss.t.pdf(x, 3)
 
 pltf.plotDuo(x, y, z, 'Standard Normal PDF', "Student's t (v=3)", '', 'Density', "Comparison between PDF's", loc = 'upper right')
 
-def tArchFct(sig2, alpha, periods):
-    z  = np.sqrt(1 / 3) * np.random.standard_t(3, periods)
-    x  = np.zeros(periods)
-    s2 = np.ones(periods)
-
-    for t in np.arange(1, periods):
-        s2[t] = sig2 + alpha * x[t-1] ** 2
-        x[t]  = np.sqrt(s2[t]) * z[t]
-    
-    return np.array([z, x, s2])
-
-tArch = tArchFct(1., 0.8, 100)
-
-def score(ts):
-    periods = len(ts[0])
-    y = (3. * ts[0][1:] ** 2 - 1.) / (1. + ts[0][1:] ** 2)
-    u = ts[1][:periods - 1] ** 2 / ts[2][1:]
-
-    return 1 / np.sqrt(periods - 1) * sum(y * u)
-
-def score_ols(ts):
-    periods = len(ts[0])
-    y = (3. * ts[0][1:] ** 2 - 1.) / (1. + ts[0][1:] ** 2)
-    u = ts[1][:periods - 1] ** 2 / ts[2][1:]
-
-    Y = (ts[1] ** 2) - np.ones(periods)
-    X = ts[1][:periods - 1]
+tArch = tsm.tArchFct(1., 0.8, 3, 10000)
 
 sig2    = 1.0
 alpha   = 0.8
@@ -58,8 +33,8 @@ periods = 100
 n = 10000
 scores = np.zeros(n)
 for i in np.arange(n):
-    tArch = tArchFct(sig2, alpha, periods)
-    s     = score(tArch)
+    tArch = tsm.tArchFct(sig2, alpha, 3, periods)
+    s     = score.tArch3(tArch)
     scores[i] = s
 
 np.mean(scores)
@@ -77,11 +52,23 @@ pltf.hist(scores, title = 'Histogram of scores')
 
 # Next exercise 1.7
 sp500 = pd.DataFrame(pd.read_excel('C:/Users/wigr11ab/Dropbox/KU/K3/FE/Exercises/SP500.xlsx'))
-date    = sp500[['Date']][15096:]
-returns = sp500[['log-ret_x100']][15096:]
+date    = np.array(sp500[['Date']][15096:])
+returns = np.array(sp500[['log-ret_x100']][15096:])
 pltf.plotUno(date, returns)
 
-initPar = np.array([1.0, 0.8])
-llf.llfTArchSum(initPar, returns)
+initPar = np.array([1.2, 0.2])
+res = opt.minimize(llf.llfTArchSum, initPar, args = returns, method = 'L-BFGS-B')
 
-res = opt.minimize(llf.llfTArchSum, initPar, args = returns)
+# Next exercise 2.5
+gjrArch = tsm.gjrArchFct(1., 0.5, 0.9, 100)
+x = np.arange(len(gjrArch[0]))
+pltf.plotUno(x, gjrArch[0])
+
+gjrPar = np.array([0.8, 0.7, 0.9])
+resGjr = opt.minimize(llf.llfGjrArchSum, gjrPar, args = gjrArch[0], method = 'L-BFGS-B')
+
+# Conclusion: This solver is very unstable and not very efficient.
+
+# Apply to SP500 data.
+initPar = np.array([0.05, 0.5, 0.3])
+resSp = opt.minimize(llf.llfGjrArchSum, initPar, args = returns, method = 'L-BFGS-B')

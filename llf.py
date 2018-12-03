@@ -28,8 +28,24 @@ def llfTArch(theta, y):
     z       = x / s2
     log_sd2 = np.log(s2)
 
-    return -(-log_sd2 - 4 * np.log(1 + z))
+    return -log_sd2 - 4 * np.log(1 + z)
 
 def llfTArchSum(theta, y):
-    return sum(llfTArch(theta, y))
+    return -sum(llfTArch(theta, y))
+
+def llfGjrArch(theta, y):
+    if len(theta) != 3:
+        return 'Parameter must have dimension 3.'
+    end = len(y)
+    sig2, alpha, gamma = theta
+    
+    idx = (y < 0)
+    s2     = sig2 + alpha * y[:end - 1] ** 2 + gamma * idx[:end - 1] * y[:end - 1] ** 2
+    log_s2 = np.log(s2)
+
+    return -0.5 * (np.log(2 * np.pi) + log_s2 + y[1:] ** 2 / s2)
+
+def llfGjrArchSum(theta, y):
+    return -sum(llfGjrArch(theta, y))
+
 
