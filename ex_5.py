@@ -13,8 +13,8 @@ sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
 import score                           # Score module
 import scipy.stats as ss               # Distribution functions
-import plotFct as pltf                 # Custom plotting
-import llf
+import plotsModule as pltf             # Custom plotting
+import likelihoodModule as llf         # Likelihood functions
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
 # First exercise 1.5

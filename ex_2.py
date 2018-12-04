@@ -13,7 +13,7 @@ import statsmodels.api as sm
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import time series simulation
-from llf import llfAr, llfArSum     # Import llh contributions and fct.
+from likelihoodModule import llfAr, llfArSum     # Import llh contributions and fct.
 np.set_printoptions(suppress = True)   #disable scientific notation
 
 # ============================================= #
@@ -61,8 +61,8 @@ robust_se = np.sqrt(np.diag(hess.dot(score).dot(hess)))
 robust_se
 
 # Simulate new series
-ar_new = ar_fct(*estPar, periods*4) # Increased length to identify stationarity
-plt.plot(ar_new)
+arNew = tsm.arFct(*estPar, periods*4) # Increased length to identify stationarity
+plt.plot(arNew)
 plt.show()
 
 # Consider OLS regression
@@ -72,8 +72,8 @@ mu, rho = results.params
 
 residuals = spread[1:] - mu - rho * spread[0:periods- 1]
 sig = np.std(residuals)
-ols_par = np.array([mu, rho, sig])
+olsPar = np.array([mu, rho, sig])
 
 # Compare parameters from MLE with OLS
-ols_par
+olsPar
 estPar

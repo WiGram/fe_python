@@ -11,7 +11,7 @@ import statsmodels.api as sm           # OLS estimation
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
-import plotFct as pltf                 # Custom plotting
+import plotsModule as pltf             # Custom plotting
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
 periods = 1000
