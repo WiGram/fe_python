@@ -48,17 +48,17 @@ spread_opt = opt.minimize(llfArSum, par, args = spread, method = 'L-BFGS-B')
 estPar = spread_opt.x
 
 # Calculate standard errors
-h_fct = nd.Hessian(llfArSum)
-hess  = np.linalg.inv(h_fct(estPar, spread))
+hFct = nd.Hessian(llfArSum)
+hess  = np.linalg.inv(hFct(estPar, spread))
 se    = np.sqrt(np.diag(hess))
 
 jac_fct = nd.Jacobian(llfAr)
 jac     = jac_fct(estPar, spread)
-jac     = np.transpose(jac.reshape(366,3))
+jac     = np.transpose(np.squeeze(jac, axis=0)) # Squeez removes a redundant dimension.
 score   = np.inner(jac, jac)
 
-robust_se = np.sqrt(np.diag(hess.dot(score).dot(hess)))
-robust_se
+robustSe = np.sqrt(np.diag(hess.dot(score).dot(hess)))
+robustSe
 
 # Simulate new series
 arNew = tsm.arFct(*estPar, periods*4) # Increased length to identify stationarity

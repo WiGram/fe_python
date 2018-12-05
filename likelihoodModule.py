@@ -23,15 +23,12 @@ def llfTArch(theta, y):
     end = len(y)
     sig2, alpha = theta
 
-    s2      = np.array(sig2 + alpha * y[:end - 1] ** 2)
-    x       = np.array(y[1:] ** 2)
-    z       = x / s2
-    log_sd2 = np.log(s2)
+    s2 = np.array(sig2 + alpha * y[:end - 1] ** 2)
 
-    return -log_sd2 - 4 * np.log(1 + z)
+    return -(-np.log(s2) - 4 * np.log(1 + y[1:] ** 2 / s2))
 
 def llfTArchSum(theta, y):
-    return -sum(llfTArch(theta, y))
+    return sum(llfTArch(theta, y))
 
 def llfGjrArch(theta, y):
     if len(theta) != 3:
