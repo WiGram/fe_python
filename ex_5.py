@@ -23,7 +23,7 @@ x = np.arange(-5,5,0.01)
 y = ss.norm.pdf(x)
 z = ss.t.pdf(x, 3)
 
-pltf.plotDuo(x, y, z, 'Standard Normal PDF', "Student's t (v=3)", '', 'Density', "Comparison between PDF's", loc = 'upper right')
+pltm.plotDuo(x, y, z, 'Standard Normal PDF', "Student's t (v=3)", '', 'Density', "Comparison between PDF's", loc = 'upper right')
 
 tArch = tsm.tArchFct(1., 0.8, 3, 10000)
 
