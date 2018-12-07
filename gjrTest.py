@@ -24,13 +24,10 @@ date    = np.array(sp500[['Date']][15096:])
 returns = np.array(sp500[['log-ret_x100']][15096:])
 
 def llfGjrArch(theta, y):
-    if len(theta) != 3:
-        return 'Parameter must have dimension 3.'
-    end = len(y)
     lSigma2, lAlpha, lGamma = theta
+    end = len(y)
     
-    idx = (y < 0)
-    s2     = np.exp(lSigma2) + np.exp(lAlpha) * y[:end - 1] ** 2 + np.exp(lGamma) * idx[:end - 1] * y[:end - 1] ** 2
+    s2     = np.exp(lSigma2) + np.exp(lAlpha) * y[:end - 1] ** 2 + np.exp(lGamma) * (y < 0)[:end - 1] * y[:end - 1] ** 2
     log_s2 = np.log(s2)
 
     return -0.5 * (np.log(2 * np.pi) + log_s2 + y[1:] ** 2 / s2)
@@ -38,18 +35,30 @@ def llfGjrArch(theta, y):
 def llfGjrArchSum(theta, y):
     return -sum(llfGjrArch(theta, y))
 
-initPar = np.array([1.0, 2.0, 2.0])  # sigma^2, alpha, gamma
+def seGjrArch(theta, y):
+    sig2, alpha, gamma = theta
+    end = len(y)
+
+    s2     = sig2 + alpha * y[:end - 1] ** 2 + gamma * (y < 0)[:end - 1] * y[:end - 1] ** 2
+    log_s2 = np.log(s2)
+
+    return -0.5 * (np.log(2 * np.pi) + log_s2 + y[1:] ** 2 / s2)
+
+def seGjrArchSum(theta, y):
+    return - sum(seGjrArch(theta, y))
+
+initPar = np.array([2.0, 2.0, 2.0])  # sigma^2, alpha, gamma
 resGjr  = opt.minimize(llfGjrArchSum, initPar, args = returns, method = 'L-BFGS-B')
 gjrPar  = np.exp(resGjr.x)
-mlVal   = llfGjrArchSum(gjrPar, returns)
+mlVal   = seGjrArchSum(gjrPar, returns)
 
 # Standard error calculation
-hFct = nd.Hessian(llfGjrArchSum)
+hFct = nd.Hessian(seGjrArchSum)
 hess = np.linalg.inv(hFct(gjrPar, returns))
 se   = np.sqrt(np.diag(hess))
 tVal = gjrPar / se
 
-jFct  = nd.Jacobian(llfGjrArch)
+jFct  = nd.Jacobian(seGjrArch)
 jac   = jFct(gjrPar, returns)
 jac   = np.transpose(np.squeeze(jac, axis=0)) # Squeez removes a redundant dimension.
 score = np.inner(jac, jac)
