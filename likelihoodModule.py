@@ -45,4 +45,13 @@ def llfGjrArch(theta, y):
 def llfGjrArchSum(theta, y):
     return -sum(llfGjrArch(theta, y))
 
+def deltaGjrArch(theta, y):
+    end = len(y)
+    sig2, alpha, gamma = theta
 
+    s2 = np.exp(sig2) + np.exp(alpha) * y[:end - 1] ** 2 + np.exp(gamma) * (y < 0)[:end - 1] * y[:end - 1] ** 2
+
+    return -0.5 * (np.log(2 * np.pi) + np.log(s2) + y[1:] ** 2 / s2)
+
+def deltaGjrArchSum(theta, y):
+    return -sum(deltaGjrArch(theta, y))

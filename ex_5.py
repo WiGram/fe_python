@@ -86,27 +86,32 @@ gjrArch = tsm.gjrArchFct(1., 0.5, 0.9, 100)
 x = np.arange(len(gjrArch[0]))
 pltm.plotUno(x, gjrArch[0], title = 'GJR-ARCH(1) Return process')
 
-# Apply to SP500 data.
-initPar = np.array([0.80, 0.06, 0.20])  # sigma^2, alpha, gamma
-resGjr  = opt.minimize(llm.llfGjrArchSum, initPar, args = returns, method = 'L-BFGS-B')
+# Apply to SP500 data (we transform the parameters - will need the delta method)
+initPar = np.array([2.0, 2.0, 2.0])  # log(sigma^2, alpha, gamma)
+resGjr  = opt.minimize(llm.deltaGjrArchSum, initPar, args = returns, method = 'L-BFGS-B')
 gjrPar  = resGjr.x
-mlVal   = llm.llfGjrArchSum(gjrPar, returns)
+mlVal   = llm.deltaGjrArchSum(gjrPar, returns)
 
 # Standard error calculation
-hFct = nd.Hessian(llm.llfGjrArchSum)
+hFct = nd.Hessian(llm.deltaGjrArchSum)
 hess = np.linalg.inv(hFct(gjrPar, returns))
-se   = np.sqrt(np.diag(hess))
-tVal = gjrPar / se
 
-jFct  = nd.Jacobian(llm.llfGjrArch)
+jFct  = nd.Jacobian(llm.deltaGjrArch)
 jac   = jFct(gjrPar, returns)
 jac   = np.transpose(np.squeeze(jac, axis=0)) # Squeez removes a redundant dimension.
 score = np.inner(jac, jac)
 
-seRobust   = np.sqrt(np.diag(hess.dot(score).dot(hess)))
-tValRobust = gjrPar / seRobust
+sandwich = hess.dot(score).dot(hess)
 
-mlResults = pd.DataFrame([gjrPar, se, seRobust, tVal, tValRobust, mlVal], \
+jacA = nd.Jacobian(np.exp)
+A    = jacA(gjrPar)
+
+# Applying the delta method to transformed parameters to
+# find se for non-transformed parameters
+se = np.sqrt(np.diag(A.dot(sandwich).dot(np.transpose(A))))
+tVal = np.exp(gjrPar) / se
+
+mlResults = pd.DataFrame([np.exp(gjrPar), se, tVal, mlVal], \
                          columns=['sigma2', 'alpha', 'gamma'], \
-                         index=['estimate', 'se', 'robust se', 't-val', 'robust t-val', 'ml val'])
+                         index=['estimate', 'se', 't-val', 'ml val'])
 mlResults
