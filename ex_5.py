@@ -12,7 +12,7 @@ import statsmodels.api as sm           # OLS estimation
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
-import score                           # Score module
+import scoreModule as score            # Score module
 import scipy.stats as ss               # Distribution functions
 import plotsModule as pltm             # Custom plotting
 import likelihoodModule as llm         # Likelihood functions

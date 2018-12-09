@@ -12,7 +12,7 @@ import statsmodels.api as sm           # OLS estimation
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
 import timeSeriesModule as tsm         # Import ARCH simulation
-import score                           # Score module
+import scoreModule as score            # Score module
 import scipy.stats as ss               # Distribution functions
 import plotsModule as pltm             # Custom plotting
 import likelihoodModule as llm         # Likelihood functions
@@ -49,9 +49,43 @@ def seGjrArchSum(theta, y):
 
 initPar = np.array([2.0, 2.0, 2.0])  # sigma^2, alpha, gamma
 resGjr  = opt.minimize(llfGjrArchSum, initPar, args = returns, method = 'L-BFGS-B')
-gjrPar  = np.exp(resGjr.x)
-mlVal   = seGjrArchSum(gjrPar, returns)
+gjrPar  = resGjr.x
+mlVal   = llfGjrArchSum(gjrPar, returns)
 
+# Standard errors by Delta-method
+
+# Calculate the information (2nd deriv)
+hFct = nd.Hessian(llfGjrArchSum)
+hess = np.linalg.inv(hFct(gjrPar, returns))
+
+# Calculate the score (1st derivative)
+jFct  = nd.Jacobian(llfGjrArch)
+jac   = jFct(gjrPar, returns)
+jac   = np.transpose(np.squeeze(jac, axis = 0))
+score = np.inner(jac, jac)
+
+# Calculate the Sandwich se
+Sandwich = hess.dot(score).dot(hess)
+
+# Calculate derivatives matrix
+jacA = nd.Jacobian(np.exp)
+A    = jacA(gjrPar)
+
+# Calculate the SE belonging to non-transformed data
+se   = np.sqrt(np.diag(A.dot(Sandwich).dot(np.transpose(A))))
+tVal = np.exp(gjrPar) / se
+
+mlResults = pd.DataFrame([np.exp(gjrPar), se, tVal, mlVal], \
+                         columns=['sigma2', 'alpha', 'gamma'], \
+                         index=['estimate', 'se', 't-val', 'ml val'])
+mlResults
+
+# Calculate A analytically or numerically
+A    = np.array([[np.exp(gjrPar[0]), 0, 0],
+                 [0, np.exp(gjrPar[1]), 0],
+                 [0, 0, np.exp(gjrPar[2])]])
+
+# Crude method
 # Standard error calculation
 hFct = nd.Hessian(seGjrArchSum)
 hess = np.linalg.inv(hFct(gjrPar, returns))
@@ -66,7 +100,7 @@ score = np.inner(jac, jac)
 seRobust   = np.sqrt(np.diag(hess.dot(score).dot(hess)))
 tValRobust = gjrPar / seRobust
 
-mlResults = pd.DataFrame([gjrPar, se, seRobust, tVal, tValRobust, mlVal], \
+mlcResults = pd.DataFrame([gjrPar, se, seRobust, tVal, tValRobust, mlVal], \
                          columns=['sigma2', 'alpha', 'gamma'], \
                          index=['estimate', 'se', 'robust se', 't-val', 'robust t-val', 'ml val'])
-mlResults
+mlcResults

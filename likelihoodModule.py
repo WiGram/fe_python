@@ -47,11 +47,27 @@ def llfGjrArchSum(theta, y):
 
 def deltaGjrArch(theta, y):
     end = len(y)
-    sig2, alpha, gamma = theta
+    sig2, alpha, gamma = np.exp(theta)
+    yLag2 = y[:end - 1] ** 2
 
-    s2 = np.exp(sig2) + np.exp(alpha) * y[:end - 1] ** 2 + np.exp(gamma) * (y < 0)[:end - 1] * y[:end - 1] ** 2
+    s2 = sig2 + alpha * yLag2 + gamma * (y < 0)[:end - 1] * yLag2
 
     return -0.5 * (np.log(2 * np.pi) + np.log(s2) + y[1:] ** 2 / s2)
 
 def deltaGjrArchSum(theta, y):
     return -sum(deltaGjrArch(theta, y))
+
+def llfAArch(theta, y):
+    end = len(y)
+    sig2, alphaP, alphaN = np.exp(theta)
+    
+    idxP  = (y > 0)[:end - 1]
+    idxN  = (y < 0)[:end - 1]
+    yLag2 = y[:end - 1] ** 2
+
+    s2 = sig2 + alphaP * idxP * yLag2 + alphaN * idxN * yLag2
+
+    return -0.5 * (np.log(2 * np.pi) + np.log(s2) + y[1:] ** 2 / s2)
+
+def llfAArchSum(theta, y):
+    return - sum(llfAArch(theta, y))
