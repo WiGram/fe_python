@@ -115,3 +115,14 @@ mlResults = pd.DataFrame([np.exp(gjrPar), se, tVal, mlVal], \
                          columns=['sigma2', 'alpha', 'gamma'], \
                          index=['estimate', 'se', 't-val', 'ml val'])
 mlResults
+
+# Analysing the residuals z = x / sigma
+theta = np.exp(gjrPar)
+n  = len(returns)
+x  = np.squeeze(returns)
+s2 = theta[0] + theta[1] * x[:n - 1]**2 + theta[2] * (x < 0)[:n - 1] * x[:n - 1]**2
+z  = x[1:] / s2
+
+pltm.qqPlot(z)
+pltm.hist(z)
+pltm.plotUno(np.arange(n-1), z, yLab='Residuals')

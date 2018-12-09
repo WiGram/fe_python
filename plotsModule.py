@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt   # Default plotting
+import numpy as np
 import matplotlib.mlab as mlab
 
 plt.style.use('ggplot')                # Use grid from likes of R
@@ -64,3 +65,8 @@ def hist(x, bins = 50, density = True, title = '', loc = 'upper right'):
     fig.tight_layout()
     return plt.show()
 
+def qqPlot(z, yLab = 'Empirical Quantiles', xLab = 'Theoretical Quantiles', title = 'Normal QQ-Plot'):
+    x = np.sort(np.random.normal(size = len(z)))
+    z = np.sort(np.squeeze(z))
+    
+    return scatterUno(x, z, yLab = yLab, xLab = xLab, title = title)
