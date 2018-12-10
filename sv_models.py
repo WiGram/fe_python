@@ -60,9 +60,9 @@ for t in range(1,mat):
     if state_ms[t-1] == 0:
         state_ms[t] = (u[t] < p11) * 0 + (u[t] > p11) * 1
     else:
-        state_ms[t] = (u[t] < p22) * 1 + (u[t] > p11) * 0
+        state_ms[t] = (u[t] < p22) * 1 + (u[t] > p22) * 0
 
-returns_ms = (state_ms == 1) * s_h * z + (state_ms == 0) * s_l * z
+returns_ms = (state_ms * s_h + (1 - state_ms) * s_l) * z
 plotting(plot_time, returns_ms, state_ms, 'Returns', 'State',
          'Time', 'Returns', 'Markov Switching SV Model')
 

@@ -1,5 +1,5 @@
-class AR(object):
-    def __init__(self, data = None, ar_order = 0):
+class gjrArch(object):
+    def __init__(self, initPar = None, data = None, est = None, se = None, rSe = None, tStat = None, rtStat = None, mlVal = None):
         # Attributes
         self._data = data
         self._ar_order = ar_order
