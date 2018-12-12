@@ -1,22 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mon 10 12:47:47 2018
+Created on Mon 10 12:47:47 2018
 
 @author: wigr11ab
 """
 
-# import pandas as pd                    # Reads data
 import numpy as np                     # Efficient programming
-# import numdifftools as nd              # Finding derivatives
-# import scipy.optimize as opt           # Minimisation for MLE
-# import statsmodels.api as sm           # OLS estimation
 import sys                             # Appending library of cuntions
 sys.path.append("C:/Users/wigr11ab/Dropbox/KU/K3/FE/Python/")
-import timeSeriesModule as tsm         # Import ARCH simulation
-# import scoreModule as scm              # Score module
-import scipy.stats as ss               # Distribution functions
 import plotsModule as pltm             # Custom plotting
-import likelihoodModule as llm         # Likelihood functions
 from matplotlib import pyplot as plt   # Bespoke plotting
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
@@ -74,6 +66,7 @@ for t in range(1,mat):
 
 x = np.arange(0,mat)
 returns_ms = (state_ms * s_h + (1 - state_ms) * s_l) * z
+
 pltm.plotDuo(x = x, y1 = returns_ms, y2 = state_ms, \
             yLab1 = 'Returns', yLab2 = 'State', \
             yLab = 'Returns', xLab = 'Time')
