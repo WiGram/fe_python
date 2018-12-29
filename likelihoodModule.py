@@ -19,16 +19,16 @@ def llfAr(theta, y):
 def llfArSum(theta, y):
     return sum(llfAr(theta, y))
 
-def llfTArch(theta, y):
+def llfArch(theta, y):
     end = len(y)
-    sig2, alpha = theta
+    sig2, alpha = np.exp(theta)
 
-    s2 = np.array(sig2 + alpha * y[:end - 1] ** 2)
+    s2 = sig2 + alpha * y[:end - 1] ** 2
 
     return -(-np.log(s2) - 4 * np.log(1 + y[1:] ** 2 / s2))
 
-def llfTArchSum(theta, y):
-    return sum(llfTArch(theta, y))
+def llfArchSum(theta, y):
+    return sum(llfArch(theta, y))
 
 def llfGjrArch(theta, y):
     if len(theta) != 3:

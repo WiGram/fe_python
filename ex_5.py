@@ -58,17 +58,17 @@ returns = np.array(sp500[['log-ret_x100']][15096:])
 pltm.plotUno(date, returns)
 
 initPar = np.array([0.05, 0.5])  # sigma^2; alpha
-res = opt.minimize(llm.llfTArchSum, initPar, args = returns, method = 'L-BFGS-B')
+res = opt.minimize(llm.llfArchSum, initPar, args = returns, method = 'L-BFGS-B')
 estPar = res.x
-mlVal  = llm.llfTArchSum(estPar, returns)
+mlVal  = llm.llfArchSum(estPar, returns)
 
 # Standard error calculation
-hFct = nd.Hessian(llm.llfTArchSum)
+hFct = nd.Hessian(llm.llfArchSum)
 hess = np.linalg.inv(hFct(estPar, returns))
 se   = np.sqrt(np.diag(hess))
 tVal = estPar / se
 
-jFct  = nd.Jacobian(llm.llfTArch)
+jFct  = nd.Jacobian(llm.llfArch)
 jac   = jFct(estPar, returns)
 jac   = np.transpose(np.squeeze(jac, axis=0)) # Squeez removes a redundant dimension.
 score = np.inner(jac, jac)
