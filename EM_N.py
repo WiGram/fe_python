@@ -9,7 +9,9 @@ import likelihoodModule as llm
 import plotsModule as pltm
 import numpy as np
 import pandas as pd
+import quandl
 import scipy.optimize as opt
+from pandas_datareader import data as web
 np.set_printoptions(suppress = True)   # Disable scientific notation
 
 # ============================================= #
@@ -97,14 +99,26 @@ def logLikFct(vol, p, pStar, pStarT):
 # ============================================= #
 
 # 0. Load S&P 500 data
-sp500 = pd.DataFrame(pd.read_excel('C:/Users/wigr11ab/Dropbox/KU/K3/FE/Exercises/SP500.xlsx'))
-y     = np.array(sp500['log-ret_x100'][15096:]) # returns
+#sp500 = pd.read_excel('C:/Users/wigr11ab/Dropbox/KU/K3/FE/Exercises/SP500.xlsx')
+#d     = np.array(sp500['Date'][15096:], dtype = 'datetime64[D]')
+#y     = np.array(sp500['log-ret_x100'][15096:]) # returns
+
+sbl = '^GSPC'
+bgn = '1976-01-01'
+end = '2000-12-31'
+src = 'yahoo'
+
+sp500 = web.DataReader(sbl, src, bgn, end)['Close'].to_frame().resample('MS').mean().round()
+close = np.array(sp500['Close'])
+d     = np.array(sp500.index, dtype = 'datetime64[D]')[1:]
+mat   = len(close)
+y = (np.log(close[1:]) - np.log(close[:mat-1])) * 100
 
 # 1. Set initial parameters
 
 mat      = len(y)
-states   = 4
-sims     = 500
+states   = 3
+sims     = 10000
 llh      = np.zeros(sims)
 
 # store variances and probabilities
@@ -153,13 +167,21 @@ for m in range(sims):
     ps[:, m] = p
     llh[m] = logLik
 
+# ============================================= #
+# ===== Plotting ============================== #
+# ============================================= #
 
-# Plotting must be done manually, so far
-# pltm.plotDuo(range(sims), vs[0,:], vs[1,:], 'Var_1', 'Var_2', 'Trials', 'Variance')
-# pltm.plotTri(range(sims), vs[0,:], vs[1,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Variance')
-pltm.plotQuad(range(sims), vs[0,:], vs[1,:], vs[2,:], vs[3,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Var_4', 'Variance')
-# pltm.plotDuo(range(sims), ps[0,:], ps[3,:], 'p11', 'p22', 'Trials', 'Probability')
-# pltm.plotTri(range(sims), ps[0,:], ps[4,:], ps[8,:], 'Trials', 'p11', 'p22', 'p33', 'Probability')
-pltm.plotQuad(range(sims), ps[0,:], ps[5,:], ps[10,:], ps[15,:], 'Trials', 'p11', 'p22', 'p33', 'p44', 'Probability')
+if states == 2:
+    pltm.plotDuo(range(sims), vs[0,:], vs[1,:], 'Var_1', 'Var_2', 'Trials', 'Variance')
+    pltm.plotDuo(range(sims), ps[0,:], ps[3,:], 'p11', 'p22', 'Trials', 'Probability')
+elif states == 3:
+    pltm.plotTri(range(sims), vs[0,:], vs[1,:], vs[2,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Variance')
+    pltm.plotTri(range(sims), ps[0,:], ps[4,:], ps[8,:], 'Trials', 'p11', 'p22', 'p33', 'Probability')
+    pltm.plotUno(d, pStar[0,:], xLab = 'Time', yLab = 'p1', title = 'Smoothed State Probabilities')
+    pltm.plotUno(d, pStar[1,:], xLab = 'Time', yLab = 'p2', title = 'Smoothed State Probabilities')
+    pltm.plotUno(d, pStar[2,:], xLab = 'Time', yLab = 'p3', title = 'Smoothed State Probabilities')
+elif states == 4:
+    pltm.plotQuad(range(sims), vs[0,:], vs[1,:], vs[2,:], vs[3,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Var_4', 'Variance')
+    pltm.plotQuad(range(sims), ps[0,:], ps[5,:], ps[10,:], ps[15,:], 'Trials', 'p11', 'p22', 'p33', 'p44', 'Probability')
+
 pltm.plotUno(range(sims), llh, yLab = 'log-likelihood value')
-
