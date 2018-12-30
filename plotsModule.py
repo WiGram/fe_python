@@ -37,6 +37,19 @@ def plotTri(x, y1, y2, y3, xLab, yLab1, yLab2, yLab3, yLab, title = "", loc = 'l
     fig.tight_layout()
     return plt.show()
 
+def plotQuad(x, y1, y2, y3, y4, xLab, yLab1, yLab2, yLab3, yLab4, yLab, title = "", loc = 'lower right'):
+    fig, ax = plt.subplots(figsize = (8,5))
+    ax.plot(x, y1, label = yLab1)
+    ax.plot(x, y2, label = yLab2)
+    ax.plot(x, y3, label = yLab3)
+    ax.plot(x, y4, label = yLab4)
+    ax.set_title(title)
+    ax.legend(loc = loc, shadow = False)
+    ax.set_ylabel(yLab)
+    ax.set_xlabel(xLab)
+    fig.tight_layout()
+    return plt.show()
+
 def plotSVModel(x, y1, y2, yLab1, yLab2, yLab, xLab, title = '', loc = 'lower right'):
     fig, ax = plt.subplots(figsize = (8,5))
     ax.plot(x, y1, label = yLab1)

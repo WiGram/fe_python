@@ -103,7 +103,7 @@ y     = np.array(sp500['log-ret_x100'][15096:]) # returns
 # 1. Set initial parameters
 
 mat      = len(y)
-states   = 3
+states   = 4
 sims     = 500
 llh      = np.zeros(sims)
 
@@ -155,9 +155,11 @@ for m in range(sims):
 
 
 # Plotting must be done manually, so far
-pltm.plotDuo(range(sims), vs[0,:], vs[1,:], 'Sigma_1', 'Sigma_2', 'Trials', 'Variance')
-pltm.plotDuo(range(sims), vs[1,:], vs[2,:], 'Sigma_2', 'Sigma_3', 'Trials', 'Variance')
-pltm.plotDuo(range(sims), ps[0,:], ps[4,:], 'p11', 'p22', 'Trials', 'Probability')
-pltm.plotDuo(range(sims), ps[4,:], ps[8,:], 'p22', 'p33', 'Trials', 'Probability')
-pltm.plotUno(range(sims), llh)
+# pltm.plotDuo(range(sims), vs[0,:], vs[1,:], 'Var_1', 'Var_2', 'Trials', 'Variance')
+# pltm.plotTri(range(sims), vs[0,:], vs[1,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Variance')
+pltm.plotQuad(range(sims), vs[0,:], vs[1,:], vs[2,:], vs[3,:], 'Trials', 'Var_1', 'Var_2', 'Var_3', 'Var_4', 'Variance')
+# pltm.plotDuo(range(sims), ps[0,:], ps[3,:], 'p11', 'p22', 'Trials', 'Probability')
+# pltm.plotTri(range(sims), ps[0,:], ps[4,:], ps[8,:], 'Trials', 'p11', 'p22', 'p33', 'Probability')
+pltm.plotQuad(range(sims), ps[0,:], ps[5,:], ps[10,:], ps[15,:], 'Trials', 'p11', 'p22', 'p33', 'p44', 'Probability')
+pltm.plotUno(range(sims), llh, yLab = 'log-likelihood value')
 
